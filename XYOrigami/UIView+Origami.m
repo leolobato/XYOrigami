@@ -35,8 +35,6 @@ KeyframeParametricBlock closeFunction = ^double(double time) {
     return -cos(time*M_PI_2)+1;
 };
 
-static XYOrigamiTransitionState XY_Origami_Current_State = XYOrigamiTransitionStateIdle;
-
 @implementation CAKeyframeAnimation (Parametric)
 
 + (id)animationWithKeyPath:(NSString *)path function:(KeyframeParametricBlock)block fromValue:(double)fromValue toValue:(double)toValue 
@@ -146,12 +144,7 @@ static XYOrigamiTransitionState XY_Origami_Current_State = XYOrigamiTransitionSt
                          Duration:(CGFloat)duration
                         Direction:(XYOrigamiDirection)direction
                        completion:(void (^)(BOOL finished))completion
-{
-    if (XY_Origami_Current_State != XYOrigamiTransitionStateIdle) {
-        return;
-    }
-    XY_Origami_Current_State = XYOrigamiTransitionStateUpdate;
-    
+{    
     //add view as parent subview
     if (![view superview]) {
         [[self superview] insertSubview:view belowSubview:self];
@@ -225,7 +218,6 @@ static XYOrigamiTransitionState XY_Origami_Current_State = XYOrigamiTransitionSt
     [CATransaction setCompletionBlock:^{
         self.frame = selfFrame;
         [origamiLayer removeFromSuperlayer];
-        XY_Origami_Current_State = XYOrigamiTransitionStateShow;
         
 		if (completion)
 			completion(YES);
@@ -245,13 +237,7 @@ static XYOrigamiTransitionState XY_Origami_Current_State = XYOrigamiTransitionSt
                          Duration:(CGFloat)duration
                         Direction:(XYOrigamiDirection)direction
                        completion:(void (^)(BOOL finished))completion
-{
-    if (XY_Origami_Current_State != XYOrigamiTransitionStateShow) {
-        return;
-    }
-    
-    XY_Origami_Current_State = XYOrigamiTransitionStateUpdate;
-    
+{    
     //set frame
     CGRect selfFrame = self.frame;
     CGPoint anchorPoint;
@@ -317,7 +303,6 @@ static XYOrigamiTransitionState XY_Origami_Current_State = XYOrigamiTransitionSt
     [CATransaction setCompletionBlock:^{
         self.frame = selfFrame;
         [origamiLayer removeFromSuperlayer];
-        XY_Origami_Current_State = XYOrigamiTransitionStateIdle;
         
 		if (completion)
 			completion(YES);
